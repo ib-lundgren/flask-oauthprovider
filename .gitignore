@@ -1,4 +1,5 @@
 *.py[co]
+*.swp
 
 # Packages
 *.egg
@@ -11,6 +12,7 @@ bin
 var
 sdist
 develop-eggs
+venv
 .installed.cfg
 
 # Installer logs
