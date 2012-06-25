@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from oauthlib.oauth1.rfc5849 import Server
-from oauthlib.oauth1.rfc5849.utils import generate_token
 from oauthlib.oauth1.rfc5849.signature import collect_parameters
-from oauthlib.common import add_params_to_uri, encode_params_utf8, urlencode
+from oauthlib.common import add_params_to_uri, encode_params_utf8
+from oauthlib.common import generate_token, urlencode
 from flask import Response, request, redirect
 from functools import wraps
 from urlparse import urlparse
@@ -24,9 +24,10 @@ class OAuthProvider(Server):
     * register(self)
     * save_timestamp_and_nonce(self, client_key, timestamp, nonce,
             request_token=None, access_token=None
-    * authorize(self):
+    * authorize(self)
+    * get_callback(self, request_token)
     * save_request_token(self, client_key, request_token, realm=None,
-            secret=None):
+            secret=None)
     * save_verifier(self, client_key, request_token, verifier)
     * save_access_token(self, client_key, request_token, realm=None,
             secret=None)
@@ -150,6 +151,11 @@ class OAuthProvider(Server):
         """
         raise NotImplementedError("Must be implemented by inheriting classes")
 
+    
+    def get_callback(self, request_token):
+        """Return the callback associated with the request token."""
+        raise NotImplementedError("Must be implemented by inheriting classes")
+
     def save_request_token(self, client_key, request_token, realm=None,
             secret=None):
         """Store request tokens.
@@ -227,10 +233,12 @@ class OAuthProvider(Server):
         """
         client_key = request.oauth.client_key
         realm = request.oauth.realm
-        request_token = generate_token(length=self.resource_owner_key_length[1])
+        # TODO: fallback on default realm?
+        callback = request.oauth.callback_uri
+        request_token = generate_token(length=self.request_token_length[1])
         token_secret = generate_token(length=self.secret_length)
-        self.save_request_token(client_key, request_token, realm=realm,
-            secret=token_secret)
+        self.save_request_token(client_key, request_token, callback, 
+            realm=realm, secret=token_secret)
         return urlencode([(u'oauth_token', request_token),
                           (u'oauth_token_secret', token_secret),
                           (u'oauth_callback_confirmed', u'true')])
@@ -240,7 +248,7 @@ class OAuthProvider(Server):
 
         Defaults to /access_token. Invoked by client applications.
         """
-        access_token = generate_token(length=self.resource_owner_key_length[1])
+        access_token = generate_token(length=self.access_token_length[1])
         token_secret = generate_token(self.secret_length)
         client_key = request.oauth.client_key
         self.save_access_token(client_key, access_token,
