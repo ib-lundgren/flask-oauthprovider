@@ -21,7 +21,7 @@ setup(
     author_email='ib.lundgren@gmail.com',
     url='https://github.com/ib-lundgren/flask-oauthprovider',
     license=fread('LICENSE'),
-    packages=find_packages(exclude=('docs')),
+    py_modules=['flask_oauthprovider'],
     test_suite='nose.collector',
     tests_require=tests_require,
     extras_require={'test': tests_require},
