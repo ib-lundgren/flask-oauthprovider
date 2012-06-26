@@ -9,7 +9,8 @@ app.config.update(
     SERVER_NAME = "client.local:5001"
 )
 # TODO: read client key + secret from some config
-
+# OBS!: Due to cookie saving issue on localhost client.local is used
+# and must be setup in for example /etc/hosts
 
 @app.route("/start")
 def start():
