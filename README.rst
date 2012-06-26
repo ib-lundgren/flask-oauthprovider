@@ -30,6 +30,27 @@ into the very readable `OAuth 1 RFC 5849 spec`_.
 .. _`hueniverse`: http://hueniverse.com/oauth/
 .. _`OAuth 1 RFC 5849 spec`: http://tools.ietf.org/html/rfc5849
 
+Example
+-------
+
+Take a look at the example application for a fully working, SQLite / SQLAlchemy
+backed OAuth provider in the `/examples`_ folder.
+
+Before running the demo you need to install a few dependencies (virtualenv is 
+highly recommended). This will be replaced by a single line of pip soon...::
+
+    $ virtualenv venv
+    $ source venv/bin/activate
+    (venv)$ git clone https://github.com/idan/oauthlib.git
+    (venv)$ python oauthlib/setup.py install
+    (venv)$ git clone https://github.com/ib-lundgren/flask-oauthprovider.git 
+    (venv)$ python flask-oauthprovider/setup.py install
+    (venv)$ pip install flask-openid sqlalchemy
+
+After installing you can run the demo application::
+
+    (venv)$ python flask-oauthprovider/examples/runserver.py
+
 Usage
 -----
 
@@ -38,9 +59,6 @@ You will need to implement a number of abstract methods, required from either
 Server (`OAuthLib`_) or OAuthProvider(Flask-OAuthProvider). These methods are 
 mainly data storage or retrieval methods. No assumptions are made about
 the persistence system you use and as such you are free to use any you see fit.
-
-Take a look at the example application for a fully working, SQLite / SQLAlchemy
-backed OAuth provider in the `/examples`_ folder.
 
 While implementing your provider class you want to give `OAuthLib Server docs`_
 and the `OAuthProvider source`_ a thorough read.
