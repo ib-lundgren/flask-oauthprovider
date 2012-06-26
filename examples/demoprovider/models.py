@@ -1,26 +1,35 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker, relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
+
+engine = create_engine("sqlite:///flask-oauthprovider.db")
+db_session = scoped_session(sessionmaker(bind=engine))
 Base = declarative_base()
+Base.query = db_session.query_property()
+
+
+def init_db():
+    Base.metadata.create_all(bind=engine)
+
 
 class ResourceOwner(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
-    username = Column(String)
-    password = Column(String)
+    name = Column(String)
+    email = Column(String)
+    openid = Column(String)
 
     request_tokens = relationship("RequestToken", order_by="RequestToken.id", backref="resource_owner")
     access_tokens = relationship("AccessToken", order_by="AccessToken.id", backref="resource_owner")
 
-    def __init__(self, username, password):
-        self.username = username
-        # TODO: scrypt, flask login?
-        self.password = password
+    def __init__(self, name, email, openid):
+        self.name = name
+        self.email = email
+        self.openid = openid
 
     def __repr__(self):
-        return "<User (%s)>" % (self.username,)
+        return "<ResourceOwner (%s, %s)>" % (self.name, self.email)
 
 
 class Client(Base):

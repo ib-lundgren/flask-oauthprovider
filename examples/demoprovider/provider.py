@@ -1,19 +1,11 @@
 from flask import request, render_template, session
-from flask.ext import oauthprovider
+from flask.ext.oauthprovider import OAuthProvider
 from sqlalchemy.orm.exc import NoResultFound
 from models import ResourceOwner, Client, Nonce, Callback
 from models import RequestToken, AccessToken
-import logging
 
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
-from models import Base
-engine = create_engine('sqlite:///test.db', echo=True)
-Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-session = Session()
 
-class ExampleProvider(oauthprovider.OAuthProvider):
+class ExampleProvider(OAuthProvider):
 
     @property
     def enforce_ssl(self):
@@ -26,12 +18,11 @@ class ExampleProvider(oauthprovider.OAuthProvider):
     def authorize(self):
         if request.method == u"POST":
             token = request.form.get("oauth_token")
-            return self.authorized(token)            
+            return self.authorized(token)
         else:
             # TODO: Authenticate client
             token = request.args.get(u"oauth_token")
             return render_template(u"authorize.html", token=token)
-        
 
     def register(self):
         if request.method == u'POST':
