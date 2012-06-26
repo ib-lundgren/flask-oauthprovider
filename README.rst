@@ -33,7 +33,7 @@ into the very readable `OAuth 1 RFC 5849 spec`_.
 Usage
 -----
 
-Flask-OAuthProvider builds opon OAuthLib and its `OAuth 1 RFC 5849 Server`_ class.
+Flask-OAuthProvider builds opon `OAuthLib`_ and its `OAuth 1 RFC 5849 Server`_ class.
 You will need to implement a number of abstract methods, required from either
 Server (`OAuthLib`_) or OAuthProvider(Flask-OAuthProvider). These methods are 
 mainly data storage or retrieval methods. No assumptions are made about
@@ -45,7 +45,15 @@ backed OAuth provider in the `/examples`_ folder.
 While implementing your provider class you want to give `OAuthLib Server docs`_
 and the `OAuthProvider source`_ a thorough read.
 
-When done, it will be easy to secure your API with OAuth::
+The implementation guide is on its way, feel free to take a look at the overview
+pictures of how Flask-OAuthProvider and OAuthLib fit into the OAuth workflow.
+
+* `Client registration`_
+* `Request tokens`_
+* `Access tokens`_
+* `Request verification`_
+
+When you have hacked together a shiny provider class it will be easy to secure your API with OAuth::
 
     app = Flask(__name__)
     provider = YourProvider(app)
@@ -61,10 +69,15 @@ When done, it will be easy to secure your API with OAuth::
 .. _`/examples`: https://github.com/ib-lundgren/flask-oauthprovider/tree/master/examples
 .. _`OAuthLib Server docs`: https://github.com/idan/oauthlib/blob/master/docs/server.rst
 .. _`OAuthProvider source`: https://github.com/ib-lundgren/flask-oauthprovider/blob/master/flask_oauthprovider.py
+.. _`Client registration`: https://github.com/ib-lundgren/flask-oauthprovider/raw/master/docs/images/client_registration.png
+.. _`Request tokens`: https://github.com/ib-lundgren/flask-oauthprovider/raw/master/docs/images/request_token.png
+.. _`Access tokens`: https://github.com/ib-lundgren/flask-oauthprovider/raw/master/docs/images/access_token.png 
+.. _`Request verification`: https://github.com/ib-lundgren/flask-oauthprovider/raw/master/docs/images/request_verification.png
 
 Install
 -------
 
-Flask-OAuthProvider is easily installed using pip::
+Flask-OAuthProvider will be easily installed using pip when OAuthLib 0.2.0 is available on pypi  ::
 
     pip install flask-oauthprovider
+
