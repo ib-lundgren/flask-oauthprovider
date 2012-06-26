@@ -1,7 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
 <form method="POST" action="/register">
-    <label>Title <input type="text" name="name"/></label><br/>
-    <label>Description <input type="text" name="description"/></label><br/>
-    <label>Callback URI <input type="text" name="callback"/></label><br/>
-    <label>RSA public key <textarea name="pubkey"></textarea></label><br/>
-    <input type="submit" name="registered" value="Register new client"/>
+    <label>Title </label><input type="text" name="name"/>
+    <label>Description </label><input type="text" name="description"/>
+    <label>Callback URI </label><input type="text" name="callback"/>
+    <label>RSA public key </label><textarea name="pubkey"></textarea>
+    <br/>
+    <button type="submit" class="btn">Register new client</button>
 </form>
+{% endblock %}
