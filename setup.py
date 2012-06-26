@@ -10,7 +10,7 @@ def fread(fn):
 
 tests_require = ['nose', 'unittest2']
 
-requires = ['oauthlib']
+requires = ['oauthlib>=0.2.0']
 
 setup(
     name='flask-oauthprovider',
