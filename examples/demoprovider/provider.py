@@ -1,8 +1,8 @@
-from flask import request, render_template, session
+from flask import request, render_template
 from flask.ext.oauthprovider import OAuthProvider
 from sqlalchemy.orm.exc import NoResultFound
 from models import ResourceOwner, Client, Nonce, Callback
-from models import RequestToken, AccessToken
+from models import RequestToken, AccessToken, db_session
 from utils import require_openid
 
 
@@ -48,8 +48,8 @@ class ExampleProvider(OAuthProvider):
             }
             client = Client(**info)
             client.callbacks.append(Callback(callback))
-            session.add(client)
-            session.commit()
+            db_session.add(client)
+            db_session.commit()
             return render_template(u"client.html", **info)
         else:
             return render_template(u"register.html")
@@ -73,18 +73,18 @@ class ExampleProvider(OAuthProvider):
                 AccessToken.token == access_token
             ])
         try:
-            session.query(Nonce, Client, ResourceOwner).filter(*filters).one()
+            db_session.query(Nonce, Client, ResourceOwner).filter(*filters).one()
             return False
         except NoResultFound:
             return True
 
     def validate_redirect_uri(self, client_key, redirect_uri=None):
         try:
-            callbacks = session.query(Client).filter(Client.client_key == client_key).one().callbacks
-            if redirect_uri in (x.callback for x in callbacks):
+            client = Client.query.filter_by(client_key=client_key).one()
+            if redirect_uri in (x.callback for x in client.callbacks):
                 return True
 
-            elif len(callbacks) == 1 and redirect_uri is None:
+            elif len(client.callbacks) == 1 and redirect_uri is None:
                 return True
 
             else:
@@ -95,8 +95,9 @@ class ExampleProvider(OAuthProvider):
 
     def validate_client_key(self, client_key):
         try:
-            session.query(Client).filter(Client.client_key == client_key).one()
+            Client.query.filter_by(client_key=client_key).one()
             return True
+
         except NoResultFound:
             return False
 
@@ -111,7 +112,7 @@ class ExampleProvider(OAuthProvider):
         # insert other check, ie on uri here
 
         try:
-            token = session.query(AccessToken, Client).filter(
+            token = db_session.query(AccessToken, Client).filter(
                     Client.client_key == client_key,
                     AccessToken.token == access_token).one().AccessToken
             return token.realm in required_realm
@@ -128,112 +129,111 @@ class ExampleProvider(OAuthProvider):
         return u'dummy_resource_owner'
 
     def validate_request_token(self, client_key, resource_owner_key):
+        # TODO: make client_key optional
         if client_key:
-            # TODO: make client_key optional
-            session.query(RequestToken, Client).filter(
+            db_session.query(RequestToken, Client).filter(
                 RequestToken.token == resource_owner_key,
                 Client.client_key == client_key).one()
         else:
-            session.query(RequestToken).filter(
-                RequestToken.token == resource_owner_key).one()
+            RequestToken.query.filter_by(token=resource_owner_key).one()
         try:
             return True
+
         except NoResultFound:
             return False
 
     def validate_access_token(self, client_key, resource_owner_key):
-        filters = [
-            Client.client_key == client_key,
-            Client.id == AccessToken.client_id,
-            AccessToken.token == resource_owner_key
-        ]
         try:
-            session.query(AccessToken, Client).filter(*filters).one()
+            db_session.query(AccessToken, Client).filter(
+                Client.client_key == client_key,
+                Client.id == AccessToken.client_id,
+                AccessToken.token == resource_owner_key
+            ).one()
             return True
+
         except NoResultFound:
             return False
 
     def validate_verifier(self, client_key, resource_owner_key, verifier):
-        filters = [
-            Client.client_key == client_key,
-            RequestToken.token == resource_owner_key,
-            RequestToken.verifier == verifier
-        ]
         try:
-            session.query(RequestToken, Client).filter(*filters).one()
+            db_session.query(RequestToken, Client).filter(
+                Client.client_key == client_key,
+                RequestToken.token == resource_owner_key,
+                RequestToken.verifier == verifier
+            ).one()
             return True
         except NoResultFound:
             return False
 
     def get_callback(self, request_token):
-        return session.query(RequestToken).filter(
-            RequestToken.token == request_token).one().callback
+        return RequestToken.query.filter_by(token=request_token).one().callback
 
     def get_realm(self, client_key, request_token):
-        query = session.query(RequestToken, Client).filter(
-                Client.client_key == client_key,
-                RequestToken.token == request_token).one()
-        return query.RequestToken.realm
+        return db_session.query(RequestToken, Client).filter(
+                    Client.client_key == client_key,
+                    RequestToken.token == request_token
+        ).one().RequestToken.realm
 
     def get_client_secret(self, client_key):
         try:
-            return session.query(Client).filter(Client.client_key == client_key).one().secret
+            return Client.query.filter_by(client_key=client_key).one().secret
+
         except NoResultFound:
             return None
 
     def get_request_token_secret(self, client_key, resource_owner_key):
-        filters = [
-            RequestToken.token == resource_owner_key,
-            Client.client_key == client_key
-        ]
         try:
-            query = session.query(RequestToken, Client).filter(*filters).one()
+            query = db_session.query(RequestToken, Client).filter(
+                RequestToken.token == resource_owner_key,
+                Client.client_key == client_key
+            ).one()
             return query.RequestToken.secret
+
         except NoResultFound:
             return None
 
     def get_access_token_secret(self, client_key, resource_owner_key):
-        filters = [
-            AccessToken.token == resource_owner_key,
-            Client.client_key == client_key
-        ]
         try:
-            query = session.query(AccessToken, Client).filter(*filters).one()
+            query = db_session.query(AccessToken, Client).filter(
+                AccessToken.token == resource_owner_key,
+                Client.client_key == client_key
+            ).one()
             return query.AccessToken.secret
+
         except NoResultFound:
             return None
 
     def save_request_token(self, client_key, request_token, callback,
             realm=None, secret=None):
-        client = session.query(Client).filter(Client.client_key == client_key).one()
+        client = Client.query.filter_by(client_key=client_key).one()
         token = RequestToken(request_token, callback, secret=secret, realm=realm)
         client.requestTokens.append(token)
-        session.add(token)
-        session.commit()
+        db_session.add(token)
+        db_session.commit()
 
     def save_access_token(self, client_key, access_token, realm=None, secret=None):
-        client = session.query(Client).filter(Client.client_key == client_key).one()
+        client = Client.query.filter_by(client_key=client_key).one()
         token = AccessToken(access_token, secret=secret, realm=realm)
         client.accessTokens.append(token)
-        session.add(token)
-        session.commit()
+        db_session.add(token)
+        db_session.commit()
 
     def save_timestamp_and_nonce(self, client_key, timestamp, nonce,
             request_token=None, access_token=None):
         nonce = Nonce(nonce, timestamp)
-        nonce.client = session.query(Client).filter(Client.client_key == client_key).one()
+        nonce.client = Client.query.filter_by(client_key=client_key).one()
 
         if request_token:
-            nonce.token = session.query(RequestToken).filter(RequestToken.token == request_token).one()
+            nonce.token = RequestToken.query.filter_by(token=request_token).one()
 
         if access_token:
-            nonce.token = session.query(AccessToken).filter(AccessToken.token == access_token).one()
+            nonce.token = AccessToken.query.filter_by(token=access_token).one()
 
-        session.add(nonce)
-        session.commit()
+        db_session.add(nonce)
+        db_session.commit()
 
     def save_verifier(self, request_token, verifier):
-        token = session.query(RequestToken).filter(RequestToken.token == request_token).one()
+        token = RequestToken.query.filter_by(token=request_token).one()
         token.verifier = verifier
-        session.add(token)
-        session.commit()
+        db_session.add(token)
+        db_session.commit()
