@@ -1,4 +1,6 @@
-<table>
+{% extends "layout.html" %}
+{% block body %}
+<table class="table">
     <tr>
         <td> Client key </td>
         <td> {{ client_key }} </td>
@@ -16,3 +18,4 @@
         <td> {{ description }} </td>
     </tr>
 </table>
+{% endblock %}

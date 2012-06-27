@@ -22,7 +22,7 @@ class ResourceOwner(Base):
 
     request_tokens = relationship("RequestToken", order_by="RequestToken.id", backref="resourceOwner")
     access_tokens = relationship("AccessToken", order_by="AccessToken.id", backref="resourceOwner")
-    client = relationship("Client", order_by="Client.id", backref="resourceOwner")
+    clients = relationship("Client", order_by="Client.id", backref="resourceOwner")
 
     def __init__(self, name, email, openid):
         self.name = name

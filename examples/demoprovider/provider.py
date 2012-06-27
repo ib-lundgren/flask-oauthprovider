@@ -53,7 +53,8 @@ class ExampleProvider(OAuthProvider):
             db_session.commit()
             return render_template(u"client.html", **info)
         else:
-            return render_template(u"register.html")
+            clients = g.user.clients
+            return render_template(u"register.html", clients=clients)
 
     def validate_timestamp_and_nonce(self, client_key, timestamp, nonce,
             request_token=None, access_token=None):
