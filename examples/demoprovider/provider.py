@@ -183,6 +183,13 @@ class ExampleProvider(OAuthProvider):
         except NoResultFound:
             return None
 
+    def get_rsa_key(self, client_key):
+        try:
+            return Client.query.filter_by(client_key=client_key).one().pubkey
+
+        except NoResultFound:
+            return None
+
     def get_request_token_secret(self, client_key, resource_owner_key):
         try:
             query = db_session.query(RequestToken, Client).filter(
