@@ -8,7 +8,8 @@ def fread(fn):
 
 app.config["OAUTH_CREDENTIALS"] = {
     u"rsa_key": fread("mykey.pem"),
-    u"signature_method": u"RSA-SHA1"
+    u"signature_method": u"RSA-SHA1",
+    "signature_type": "body"
 }
 app.config["CLIENT_KEY"] = u"5kCCg9t3amq636IsP6PcDGwdJhgdRG"
 app.run(debug=True, port=5001)

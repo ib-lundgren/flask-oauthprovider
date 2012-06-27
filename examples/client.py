@@ -25,6 +25,7 @@ def start():
         **app.config["OAUTH_CREDENTIALS"])
 
     r = requests.post(u"http://127.0.0.1:5000/request_token?realm=secret", auth=client)
+    print r.content
     data = dict(parse_qsl(r.content))
     resource_owner = data.get(u'oauth_token')
     session["token_secret"] = data.get('oauth_token_secret').decode(u'utf-8')

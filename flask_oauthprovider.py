@@ -151,7 +151,7 @@ class OAuthProvider(Server):
         """
         raise NotImplementedError("Must be implemented by inheriting classes")
 
-    
+
     def get_callback(self, request_token):
         """Return the callback associated with the request token."""
         raise NotImplementedError("Must be implemented by inheriting classes")
@@ -237,7 +237,7 @@ class OAuthProvider(Server):
         callback = request.oauth.callback_uri
         request_token = generate_token(length=self.request_token_length[1])
         token_secret = generate_token(length=self.secret_length)
-        self.save_request_token(client_key, request_token, callback, 
+        self.save_request_token(client_key, request_token, callback,
             realm=realm, secret=token_secret)
         return urlencode([(u'oauth_token', request_token),
                           (u'oauth_token_secret', token_secret),
@@ -271,9 +271,13 @@ class OAuthProvider(Server):
             def verify_request(*args, **kwargs):
                 """Verify OAuth params before running view function f"""
                 try:
+                    if request.form:
+                        body = request.form.to_dict()
+                    else:
+                        body = request.data.decode("utf-8")
                     valid = self.verify_request(request.url.decode("utf-8"),
                             http_method=request.method.decode("utf-8"),
-                            body=request.data.decode("utf-8"),
+                            body=body,
                             headers=request.headers,
                             require_resource_owner=require_resource_owner,
                             require_verifier=require_verifier,
@@ -318,7 +322,10 @@ class OAuthProvider(Server):
 
         # Collect parameters
         query = urlparse(request.url.decode("utf-8")).query
-        body = request.data.decode("utf-8")
+        if request.form:
+            body = request.form.to_dict()
+        else:
+            body = request.data.decode("utf-8")
         headers = dict(encode_params_utf8(request.headers.items()))
         params = dict(collect_parameters(uri_query=query, body=body, headers=headers))
 
