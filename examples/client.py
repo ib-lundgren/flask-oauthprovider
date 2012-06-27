@@ -8,14 +8,16 @@ app.config.update(
     SECRET_KEY = "not very secret",
     SERVER_NAME = "client.local:5001"
 )
-# TODO: read client key + secret from some config
 # OBS!: Due to cookie saving issue on localhost client.local is used
 # and must be setup in for example /etc/hosts
 
+client_key = u"eSOo5JWLMPT2NPhDVnoW5yzFc8psPZ"
+client_secret = u"2AIE02vm4IUQUJGIxuLnaTNbl6N76Q"
+
 @app.route("/start")
 def start():
-    client = OAuth1(u"sHcpSA23dd7ntT6BDVqU3FmrvaeAK2", 
-        client_secret=u"pKtlX5NqIA7qGlJanHMH6rvyxZKRvD",
+    client = OAuth1(client_key, 
+        client_secret=client_secret,
         callback_uri=u"http://client.local:5001/callback")
     r = requests.post(u"http://127.0.0.1:5000/request_token?realm=secret", auth=client)
     print r.content
@@ -24,7 +26,6 @@ def start():
     session["token_secret"] = data.get('oauth_token_secret').decode(u'utf-8')
     print "Setting token secret"
     print session
-    # TODO: store secret
     url = u"http://127.0.0.1:5000/authorize?oauth_token=" + resource_owner
     return redirect(url)
 
@@ -40,9 +41,8 @@ def callback():
     token_secret = session["token_secret"]
 
     # Request the access token
-    # TODO: use secret when fetching access token
-    client = OAuth1(u"sHcpSA23dd7ntT6BDVqU3FmrvaeAK2",
-        client_secret=u"pKtlX5NqIA7qGlJanHMH6rvyxZKRvD",
+    client = OAuth1(client_key,
+        client_secret=client_secret,
         resource_owner_key=resource_owner,
         resource_owner_secret=token_secret,
         verifier=verifier)
@@ -54,8 +54,8 @@ def callback():
     resource_owner = data.get(u'oauth_token').decode(u'utf-8')
     resource_owner_secret = data.get(u'oauth_token_secret').decode(u'utf-8')
     print data
-    client = OAuth1(u"sHcpSA23dd7ntT6BDVqU3FmrvaeAK2",
-            client_secret=u"pKtlX5NqIA7qGlJanHMH6rvyxZKRvD",
+    client = OAuth1(client_key,
+            client_secret=client_secret,
             resource_owner_key=resource_owner,
             resource_owner_secret=resource_owner_secret)
     print "SUPER SECRET::", resource_owner_secret

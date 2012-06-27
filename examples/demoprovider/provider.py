@@ -1,4 +1,4 @@
-from flask import request, render_template
+from flask import request, render_template, g
 from flask.ext.oauthprovider import OAuthProvider
 from sqlalchemy.orm.exc import NoResultFound
 from models import ResourceOwner, Client, Nonce, Callback
@@ -48,6 +48,7 @@ class ExampleProvider(OAuthProvider):
             }
             client = Client(**info)
             client.callbacks.append(Callback(callback))
+            client.resource_owner = g.user
             db_session.add(client)
             db_session.commit()
             return render_template(u"client.html", **info)
@@ -205,16 +206,18 @@ class ExampleProvider(OAuthProvider):
 
     def save_request_token(self, client_key, request_token, callback,
             realm=None, secret=None):
-        client = Client.query.filter_by(client_key=client_key).one()
         token = RequestToken(request_token, callback, secret=secret, realm=realm)
-        client.requestTokens.append(token)
+        token.client = Client.query.filter_by(client_key=client_key).one()
         db_session.add(token)
         db_session.commit()
 
-    def save_access_token(self, client_key, access_token, realm=None, secret=None):
-        client = Client.query.filter_by(client_key=client_key).one()
+    def save_access_token(self, client_key, access_token, request_token,
+            realm=None, secret=None):
         token = AccessToken(access_token, secret=secret, realm=realm)
-        client.accessTokens.append(token)
+        token.client = Client.query.filter_by(client_key=client_key).one()
+        req_token = RequestToken.query.filter_by(token=request_token).one()
+        token.resource_owner = req_token.resource_owner
+        token.realm = req_token.realm
         db_session.add(token)
         db_session.commit()
 
@@ -235,5 +238,6 @@ class ExampleProvider(OAuthProvider):
     def save_verifier(self, request_token, verifier):
         token = RequestToken.query.filter_by(token=request_token).one()
         token.verifier = verifier
+        token.resource_owner = g.user
         db_session.add(token)
         db_session.commit()

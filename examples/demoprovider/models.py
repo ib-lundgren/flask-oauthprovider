@@ -20,8 +20,9 @@ class ResourceOwner(Base):
     email = Column(String)
     openid = Column(String)
 
-    request_tokens = relationship("RequestToken", order_by="RequestToken.id", backref="resource_owner")
-    access_tokens = relationship("AccessToken", order_by="AccessToken.id", backref="resource_owner")
+    request_tokens = relationship("RequestToken", order_by="RequestToken.id", backref="resourceOwner")
+    access_tokens = relationship("AccessToken", order_by="AccessToken.id", backref="resourceOwner")
+    client = relationship("Client", order_by="Client.id", backref="resourceOwner")
 
     def __init__(self, name, email, openid):
         self.name = name
@@ -42,9 +43,12 @@ class Client(Base):
     secret = Column(String)
     pubkey = Column(String)
 
-    request_tokens = relationship("RequestToken", order_by="RequestToken.id", backref="client")
-    access_tokens = relationship("AccessToken", order_by="AccessToken.id", backref="client")
+    request_tokens = relationship("RequestToken", order_by="RequestToken.id", backref="clienta")
+    access_tokens = relationship("AccessToken", order_by="AccessToken.id", backref="clientb")
     callbacks = relationship("Callback", order_by="Callback.id", backref="client")
+
+    resource_owner_id = Column(Integer, ForeignKey("users.id"))
+    resource_owner = relationship("ResourceOwner", backref=backref("client_", order_by=id))
 
     def __init__(self, client_key, name, description, secret=None, pubkey=None):
         self.client_key = client_key
@@ -110,10 +114,10 @@ class RequestToken(Base):
 
     # TODO: TTL
     client_id = Column(Integer, ForeignKey("clients.id"))
-    clients = relationship("Client", backref=backref("requestTokens", order_by=id))
+    client = relationship("Client", backref=backref("requestTokens", order_by=id))
 
     resource_owner_id = Column(Integer, ForeignKey("users.id"))
-    resource_owners = relationship("ResourceOwner", backref=backref("requestTokens", order_by=id))
+    resource_owner = relationship("ResourceOwner", backref=backref("requestTokens", order_by=id))
 
     def __init__(self, token, callback, secret=None, verifier=None, realm=None):
         self.token = token
@@ -136,10 +140,10 @@ class AccessToken(Base):
 
     # TODO: TTL
     client_id = Column(Integer, ForeignKey("clients.id"))
-    clients = relationship("Client", backref=backref("accessTokens", order_by=id))
+    client = relationship("Client", backref=backref("accessTokens", order_by=id))
 
     resource_owner_id = Column(Integer, ForeignKey("users.id"))
-    resource_owners = relationship("ResourceOwner", backref=backref("accessTokens", order_by=id))
+    resource_owner = relationship("ResourceOwner", backref=backref("accessTokens", order_by=id))
 
     def __init__(self, token, secret=None, verifier=None, realm=None):
         self.token = token

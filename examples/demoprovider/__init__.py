@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, request
 from provider import ExampleProvider
+from models import AccessToken
 
 app = Flask(__name__)
 app.config.update(
@@ -9,22 +10,21 @@ app.config.update(
 
 provider = ExampleProvider(app)
 
-
+# Imported to setup views
 import login
-print app.url_map
 
 
 @app.route("/protected")
 @provider.require_oauth()
 def protected_view():
-    #TODO: store something user related
-    return "Hej"
+    token = request.oauth.resource_owner_key
+    user = AccessToken.query.filter_by(token=token).one().resource_owner
+    return user.name
 
 
 @app.route("/protected_realm")
 @provider.require_oauth(realm="secret")
 def protected_realm_view():
-    #TODO: store something user related
-    return "Hej secret"
-
-    app.run(debug=True)
+    token = request.oauth.resource_owner_key
+    user = AccessToken.query.filter_by(token=token).one().resource_owner
+    return user.email
