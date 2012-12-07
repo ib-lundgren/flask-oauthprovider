@@ -1,0 +1,39 @@
+<!doctype html>
+<head>
+<title>{% block title %}Welcome{% endblock %} | Flask OAuth Provider Example</title>
+<link rel="stylesheet" type="text/css" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',
+filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+<h1>Flask OAuth Provider Example</h1>
+<br/>
+<div class="navbar"><div class="navbar-inner">
+<ul class="nav">
+  {% if request.path == url_for('index') %} <li class="active"> {% else %} <li> {% endif %}
+  <a href="{{ url_for('index') }}">overview</a> </li>
+  {% if g.user %}
+  {% if request.path == url_for('edit_profile') %} <li class="active"> {% else %} <li> {% endif %}
+  <a href="{{ url_for('edit_profile') }}">profile</a> </li>
+  {% if request.path == url_for('register') %} <li class="active"> {% else %} <li> {% endif %}
+  <a href="{{ url_for('register') }}"> clients</a></li>
+  {% endif %}
+</ul>
+<ul class="nav pull-right">
+  {% if g.user %}
+  <li><a href="{{ url_for('logout') }}">sign out [{{ g.user.name }}]</a>
+  {% else %}
+  <li><a href="{{ url_for('login') }}">sign in</a>
+  {% endif %}
+
+</ul>
+</div></div>
+{% for message in get_flashed_messages() %}
+    <div class="alert alert-info">     
+      <p class=message>{{ message }}
+    </div>
+{% endfor %}
+{% block body %}{% endblock %}
+</div>
+</body>

@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block body %}
+<h2>Overview</h2>
+<br/>
+{% if not g.user %}
+<p> First off, this example uses OpenID (Flask-OpenID) so sign in using your preferred OpenID provider.</p>
+{% endif %}
+
+<p> This example is a basic but functional service with an API. Through the
+    API third party clients can access user data, which in our case will simply
+    be the username and email. These resources (email, name) are considered
+    protected resources and as such requests to the API for these are protected
+    with OAuth.
+</p>
+
+<p> All clients who wish to use the API will need to register an obtain a <em>client_key</em> as well as a <em>client_secret</em>. These credentials can then be used from another example application, this time a client, found in <em>client.py</em>.
+</p>
+
+<p> After setting up the client you may access its <a href="http://client.local:5001/start"> start page </a>. Upon access the client will obtain a request token, redirect you to authorize access, obtain a request token, and finally using that token to fetch and display your email address.
+</p>
+
+{% endblock %}

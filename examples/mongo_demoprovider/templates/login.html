@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block title %}Sign in{% endblock %}
+{% block body %}
+  <form action="" method="POST">
+    {% if error %}<p class=error><strong>Error:</strong> {{ error }}</p>{% endif %}
+    <label>OpenID</label>
+      <input type=text name=openid size=30/>
+      <br/>
+      <button type="submit" class="btn">Sign in</button>
+      <input type=hidden name=next value="{{ next }}">
+  </form>
+{% endblock %}
