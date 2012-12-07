@@ -1,2 +1,2 @@
-from demoprovider.models import init_db
+from mongo_demoprovider.models import init_db
 init_db()

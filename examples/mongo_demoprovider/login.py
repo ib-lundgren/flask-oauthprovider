@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from demoprovider import app
+from mongo_demoprovider import app
 from models import ResourceOwner as User
 from flask import g, session, render_template, request, redirect, flash
 from flask import abort, url_for
