@@ -51,7 +51,7 @@ class ExampleProvider(OAuthProvider):
                 u"pubkey": pubkey
             }
             client = Client(**info)
-            client['callback'].append(callback)
+            client['callbacks'].append(callback)
             client['resource_owner_id'] = g.user['_id']
             client_id = Client.insert(client)
             g.user.client_ids.append(client_id)
@@ -89,7 +89,7 @@ class ExampleProvider(OAuthProvider):
         client = Client.find_one({'client_key':client_key})
         
         return client != None and (
-            len(client['callback']) == 1 and redirect_uri is None
+            len(client['callbacks']) == 1 and redirect_uri is None
             or redirect_uri in (x for x in client['callbacks']))
         
         

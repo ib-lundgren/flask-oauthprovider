@@ -14,8 +14,10 @@ def before_request():
     g.user = None
     if 'openid' in session:
         user_dict = User.find_one({'openid':session['openid']})
-        g.user = User()
-        g.user.update(user_dict)
+        
+        if user_dict:
+            g.user = User()
+            g.user.update(user_dict)
 
 
 @app.route('/')
