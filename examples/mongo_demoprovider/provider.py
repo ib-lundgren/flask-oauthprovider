@@ -172,28 +172,44 @@ class ExampleProvider(OAuthProvider):
         
         
     def get_callback(self, request_token):
-        return RequestToken.find_one(
-                {'token':request_token})['callback']
+        token = RequestToken.find_one(
+                {'token':request_token})
+                
+        if token:
+            return token.get('callback')
+        else:
+            return None
 
 
     def get_realm(self, client_key, request_token):
         client = Client.find_one({'client_key':client_key})
         
         if client:
-            return RequestToken.find_one(
-                {'token':request_token, 'client_id': client['_id']})['realm']
-        else:
-            return None
+            token = RequestToken.find_one(
+                {'token':request_token, 'client_id': client['_id']})
+            
+            if token:
+                return token.get('realm')
+                
+        return None
         
 
     def get_client_secret(self, client_key):
-            return Client.find_one(
-                {'client_key':client_key}).secret
+            client = Client.find_one({'client_key':client_key})
+            
+            if client:
+                return client.get('secret')
+            else:
+                return None
 
 
     def get_rsa_key(self, client_key):
-            return Client.find_one(
-                {'client_key':client_key}).pubkey
+            client = Client.find_one({'client_key':client_key})
+            
+            if client:
+                return client.get('pubkey')
+            else:
+                return None
 
     def get_request_token_secret(self, client_key, resource_owner_key):
         client = Client.find_one({'client_key':client_key})
@@ -204,7 +220,7 @@ class ExampleProvider(OAuthProvider):
                  'client_id': client['_id']})
                  
             if token:
-                return token.secret
+                return token.get('secret')
                      
         return None
         
@@ -218,7 +234,7 @@ class ExampleProvider(OAuthProvider):
                  'client_id': client['_id']})
                  
             if token:
-                return token.secret
+                return token.get('secret')
                      
         return None
 
