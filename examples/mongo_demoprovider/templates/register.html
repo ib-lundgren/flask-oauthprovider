@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block body %}
+{% if clients %}
+<h3> Registered clients </h3>
+<br/>
+<table class="table table-striped">
+    <thead>
+        <tr>
+        <th> Title </th>
+        <th> Client key </th>
+        <th> Client secret </th>
+        <th> Public key </th>
+    </tr>
+    </thead>
+    {% for client in clients %}
+    <tr>
+        <td> {{ client.name }} </td>
+        <td> {{ client.client_key }} </td>
+        <td> {{ client.secret }} </td>
+        <td> {{ client.pubkey }} </td>
+    </tr>    
+    {% endfor %}
+</table>
+{% endif %}
+<h3> Register new client </h3>
+<form method="POST" action="/register">
+    <label>Title </label><input type="text" name="name"/>
+    <label>Description </label><input type="text" name="description"/>
+    <label>Callback URI </label><input type="text" name="callback"/>
+    <label>RSA public key </label><textarea name="pubkey"></textarea>
+    <br/>
+    <button type="submit" class="btn">Register new client</button>
+</form>
+{% endblock %}

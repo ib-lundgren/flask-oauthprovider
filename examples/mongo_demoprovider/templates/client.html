@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block body %}
+<table class="table">
+    <tr>
+        <td> Client key </td>
+        <td> {{ client_key }} </td>
+    </tr>
+    <tr>
+        <td> Client secret </td>
+        <td> {{ secret }} </td>
+    </tr>
+    <tr>
+        <td> Application title </td>
+        <td> {{ name }} </td>
+    </tr>
+    <tr>
+        <td> Application description </td>
+        <td> {{ description }} </td>
+    </tr>
+</table>
+{% endblock %}

@@ -51,6 +51,27 @@ After installing you can run the demo application::
 
     (venv)$ python flask-oauthprovider/examples/runserver.py
 
+MongoDB Example
+-------
+
+This repo also includes a fully working, MongoDB / pymongo
+backed OAuth provider in the `/examples`_ folder.
+
+Before running the demo you need to install a few dependencies (virtualenv is 
+highly recommended).::
+
+    $ virtualenv venv
+    $ source venv/bin/activate
+    (venv)$ git clone https://github.com/idan/oauthlib.git
+    (venv)$ python oauthlib/setup.py install
+    (venv)$ git clone https://github.com/ib-lundgren/flask-oauthprovider.git 
+    (venv)$ python flask-oauthprovider/setup.py install
+    (venv)$ pip install flask-openid pymongo
+
+After installing you can run the demo application::
+
+    (venv)$ python flask-oauthprovider/examples/runserver_mongo.py
+
 Usage
 -----
 
