@@ -26,7 +26,7 @@ class OAuthProvider(Server):
             request_token=None, access_token=None
     * authorize(self)
     * get_callback(self, request_token)
-    * save_request_token(self, client_key, request_token, realm=None,
+    * save_request_token(self, client_key, request_token, callback, realm=None,
             secret=None)
     * save_verifier(self, client_key, request_token, verifier)
     * save_access_token(self, client_key, request_token, realm=None,
