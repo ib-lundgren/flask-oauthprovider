@@ -156,7 +156,7 @@ class OAuthProvider(Server):
         """Return the callback associated with the request token."""
         raise NotImplementedError("Must be implemented by inheriting classes")
 
-    def save_request_token(self, client_key, request_token, realm=None,
+    def save_request_token(self, client_key, request_token, callback, realm=None,
             secret=None):
         """Store request tokens.
 
