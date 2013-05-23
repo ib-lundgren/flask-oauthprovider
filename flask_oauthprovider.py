@@ -4,6 +4,7 @@ from oauthlib.oauth1.rfc5849.signature import collect_parameters
 from oauthlib.common import add_params_to_uri, encode_params_utf8
 from oauthlib.common import generate_token, urlencode
 from flask import Response, request, redirect
+from werkzeug.exceptions import Unauthorized, BadRequest
 from functools import wraps
 from urlparse import urlparse
 
@@ -305,11 +306,11 @@ class OAuthProvider(Server):
                         return f(*args, **kwargs)
                     else:
                         # Unauthorized requests should not diclose their cause
-                        return Response(status=401)
+                        raise Unauthorized()
 
                 except ValueError as err:
                     # Caused by missing of or badly formatted parameters
-                    return Response(err.message, status=400)
+                    raise BadRequest(err.message)
 
             return verify_request
         return decorator
