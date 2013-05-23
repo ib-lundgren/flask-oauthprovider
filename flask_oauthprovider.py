@@ -324,10 +324,13 @@ class OAuthProvider(Server):
 
         # Collect parameters
         query = urlparse(request.url.decode("utf-8")).query
+        content_type = request.headers.get('Content-Type', '')
         if request.form:
             body = request.form.to_dict()
-        else:
+        elif content_type == 'application/x-www-form-urlencoded':
             body = request.data.decode("utf-8")
+        else:
+            body = ''
         headers = dict(encode_params_utf8(request.headers.items()))
         params = dict(collect_parameters(uri_query=query, body=body, headers=headers))
 
