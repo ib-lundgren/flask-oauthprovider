@@ -1,6 +1,23 @@
 Flask-OAuthProvider
 ===================
 
+**July/2013: Good news and Bad news.**
+
+**Bad**: Unfortunately I am unable to dedicate much time to this extension and
+with the refactoring of OAuth 1 provider in oauthlib 0.5 quite a few changes
+are required to flask-oauthprovider. Some might break existing implementations.
+I've set version requirement of oauthlib to < 0.5 to prevent breakage for now.
+
+
+**Good**: There is a great new flask extension called `flask-oauthlib`_ under active
+development with support for both OAuth 1 and 2. I strongly encourage every
+user of flask-oauthprovider to move over to `flask-oauthlib`_. It should be quite
+painless and result in a cleaner, more Flasky, implementation for all =)
+
+.. _`flask-oauthlib`: https://github.com/lepture/flask-oauthlib 
+
+-----------
+
 Flask-OAuthProvider is an extension that makes it easy to secure your views 
 with OAuth::
 
